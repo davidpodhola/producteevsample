@@ -24,5 +24,13 @@ namespace Oak.Controllers
         {
             return new DynamicJsonResult(model);
         }
+
+        public HttpApplicationStateBase Application
+        {
+            get
+            {
+                return ControllerContext.HttpContext.Application;
+            }
+        }
     }
 }

@@ -11,7 +11,15 @@
 </head>
 <body>
     <div>
-        
+        <form action="/Test/Authenticate">
+            Client id: <input type="text" name="clientId" /> <br /><br />
+            Client secret: <input type="text" name="clientSecret" /> <br /><br />
+            <input type="submit" />
+        </form>
+
+        <hr />
+
+        @Session["TokenJson"]
     </div>
 </body>
 </html>
