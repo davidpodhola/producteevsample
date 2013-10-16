@@ -1,9 +1,13 @@
-﻿using Oak.Controllers;
+﻿using MvcApplication1.Models;
+using Oak.Controllers;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 
@@ -14,6 +18,30 @@ namespace MvcApplication1.Controllers
         //
         // GET: /Test/
 
+        public ActionResult ShowTasks()
+        {
+            string tokenJson = (string)Application["TokenJson"];
+
+            Auth auth = null;
+            var jsonSerializer = new DataContractJsonSerializer(typeof(Auth));
+            using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(tokenJson)))
+            {
+
+                auth = (Auth)jsonSerializer.ReadObject(ms); ;
+            }
+            string token = auth.access_token;
+            var client = new RestClient("https://www.producteev.com/api/tasks/search?sort=updated_at&order=desc");
+            var request = new RestRequest(Method.POST);
+            request.RequestFormat = DataFormat.Json;
+            request.AddParameter("Authorization", string.Format( "Bearer {0}", token ), ParameterType.HttpHeader );
+            request.AddParameter("Content-Type", "application/json");
+            request.AddBody("{}");
+            IRestResponse response = client.Execute(request);
+            ViewBag.ClientResponse = response;
+
+            return View();
+        }
+        
         public ActionResult Index()
         {
             return View();
@@ -42,7 +70,7 @@ namespace MvcApplication1.Controllers
                 using (StreamReader sr = new StreamReader(response.GetResponseStream()))
                 {
                     string content = sr.ReadToEnd();
-                    Session["TokenJson"] = content;
+                    Application["TokenJson"] = content;
                 }
             }
 
